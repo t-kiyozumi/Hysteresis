@@ -3,6 +3,9 @@
 #include <time.h>
 #include <unistd.h>
 
+#define dimension 30
+
+
 class dipole_state
 {
 public:
@@ -16,14 +19,14 @@ class field
 {
   public:
   double arg = (2.0*M_PI)*(1.0/4.0);
-  double strength = 0.5;
-  double strength_final = 0.5;
+  double strength = 1.5;
+  double strength_final = 1.5;
 };
-void display_cell(dipole_state[][7]);
+
+void display_cell(dipole_state[][dimension]);
 
 main()
 {
-//記録用ファイルの準備
 FILE *RecFile;
 RecFile = fopen("Rec.txt", "w");
 fprintf(RecFile, "number of trial,B,potential\n");
@@ -34,33 +37,33 @@ fprintf(RecFile, "number of trial,B,potential\n");
   double torialNo =20000;
   double allPotential = 0.0;
   field magneticField;
-  dipole_state magnetic[7][7];
+  dipole_state magnetic[dimension][dimension];
   dipole_state rand_magnetic;
 
   //無効セルの設定
-  //0行,0列,6行,6列を全て無効化
-  for (i = 0; i < 6; i++)
+  //端のセルを無効化
+  for (i = 0; i < dimension-1; i++)
   {
     magnetic[i][0].enable = 0.0;
   }
-  for (i = 0; i < 6; i++)
+  for (i = 0; i < dimension-1; i++)
   {
     magnetic[i][6].enable = 0.0;
   }
-  for (j = 0; j < 6; j++)
+  for (j = 0; j < dimension-1; j++)
   {
     magnetic[0][j].enable = 0.0;
   }
-  for (j = 0; j < 6; j++)
+  for (j = 0; j < dimension-1; j++)
   {
     magnetic[6][j].enable = 0.0;
   }
 
 
   //角度の初期化
-  for (i = 1; i <= 5; i++)
+  for (i = 1; i <= dimension-2; i++)
   {
-    for (j = 1; j <= 5; j++)
+    for (j = 1; j <= dimension-2; j++)
     {
     //ランダムな角度で初期化
     //magnetic[i][j].arg =((double)rand() / ((double)RAND_MAX + 1)) *(2*M_PI);
@@ -71,9 +74,9 @@ fprintf(RecFile, "number of trial,B,potential\n");
 
 
   //ポテンシャルの初期化
-  for (i = 1; i <= 5; i++)
+  for (i = 1; i <= dimension-2; i++)
   {
-    for (j = 1; j <= 5; j++)
+    for (j = 1; j <= dimension-2; j++)
     {
       magnetic[i][j].potential =
           -1.0 * (cos(magnetic[i + 1][j].arg - magnetic[i][j].arg)*magnetic[i + 1][j].enable
@@ -94,9 +97,9 @@ fprintf(RecFile, "number of trial,B,potential\n");
   for (k = 0; k < torialNo; k++)
   {
     printf("processing:%f %\n", (k / torialNo) * 100.0);
-    for (i = 1; i <= 5; i++)
+    for (i = 1; i <= dimension-2; i++)
     {
-      for (j = 1; j <= 5; j++)
+      for (j = 1; j <= dimension-2; j++)
       {
         //ランダムに配置
           rand_magnetic.arg = ((double)rand() / ((double)RAND_MAX + 1)) *(2*M_PI);
@@ -124,7 +127,7 @@ fprintf(RecFile, "number of trial,B,potential\n");
   return 0;
 }
 
-void display_cell(dipole_state magnetic[][7])
+void display_cell(dipole_state magnetic[][dimension])
 {
   printf("-----------------------------------------------------------------------------------------------------------------------------------------\n");
   int i, j;
